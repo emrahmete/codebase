@@ -51,7 +51,7 @@ END;
 BEGIN
     dbms_cloud.copy_data(   table_name => 'BOSTON_HOUSING',
                             credential_name => 'OBJ_STORE_CRED2', 
-                            file_uri_list => 'https://swiftobjectstorage.regino_name.oraclecloud.com/v1/tenancy_name/bucket_name/train.csv',
+                            file_uri_list => 'https://swiftobjectstorage.region_name.oraclecloud.com/v1/tenancy_name/bucket_name/train.csv',
                             format => JSON_OBJECT(  'delimiter' VALUE ',', 'ignoremissingcolumns' VALUE 'true',
                                                     'removequotes' VALUE 'true', 'skipheaders' VALUE '1'));
                                                     
@@ -63,12 +63,14 @@ BEGIN
 END;
 
 ---------- DATA LOAD TEST ----------
+
 select * from BOSTON_HOUSING;
 
 select * from BOSTON_HOUSING_TEST;
 
 
 ---------- MODEL BUILD ----------
+
 DROP TABLE neural_network_settings;
 
 CREATE TABLE neural_network_settings (
@@ -97,16 +99,16 @@ BEGIN
         setting_name,
         setting_value
     ) VALUES (
-        dbms_data_mining.nnet_activations,
-        '''NNET_ACTIVATIONS_LOG_SIG'',''NNET_ACTIVATIONS_LOG_SIG'',''NNET_ACTIVATIONS_LOG_SIG'''
+        dbms_data_mining.nnet_nodes_per_layer,
+        '512,250,100'
     );
-
+    
     INSERT INTO neural_network_settings (
         setting_name,
         setting_value
     ) VALUES (
-        dbms_data_mining.nnet_nodes_per_layer,
-        '512,250,100'
+        dbms_data_mining.nnet_activations,
+        '''NNET_ACTIVATIONS_LOG_SIG'',''NNET_ACTIVATIONS_LOG_SIG'',''NNET_ACTIVATIONS_LOG_SIG'''
     );
     
     INSERT INTO neural_network_settings (
@@ -157,6 +159,21 @@ select * from DM$VNDEEP_LEARNING_MODEL;
 SELECT
     t.*,
     PREDICTION(deep_learning_model USING *) pred
-FROM
-    boston_housing_test t;
+FROM boston_housing_test t;
+    
+    
+SELECT prediction(DEEP_LEARNING_MODEL USING 0.02 as crim,
+                                            12.5 as zn,
+                                            8.01 as indus,
+                                            0    as chas,
+                                            0.48 as nox,
+                                            6.25 as rm,
+                                            15.4 as age,
+                                            4.92 as dis,
+                                            4.00 as rad,
+                                            242  as tax,
+                                            15.3 as pratio,
+                                            399  as balck,
+                                            4.09 as lstat) pred
+FROM dual;
 
