@@ -39,7 +39,7 @@ CREATE TABLE BOSTON_HOUSING_TEST
    MEDV      NUMBER
 );
 
----------- DATA LOAD ----------
+--------- DATA LOAD ----------
 
 BEGIN
     dbms_cloud.create_credential(   credential_name => 'OBJ_STORE_CRED2', 
